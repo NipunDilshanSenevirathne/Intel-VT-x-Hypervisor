@@ -47,18 +47,18 @@ You load two kernel modules. Every online CPU is moved into VMX non-root operati
 
 | | |
 |---|---|
-| 🧬 **Late launch under a live kernel** | Each CPU is virtualized from inside a `cpuhp` callback. `VMLAUNCH` "returns" into the same function as a guest, and devirtualization reverses it with an `IRETQ`, including a TSS busy-bit dance and an NMI-safe GS/IDT ordering. |
-| 🛡️ **A root image that cannot be patched** | The VMX-root code is one translation unit, built in a separate module with no ftrace, no retpoline thunks, no CFI and no jump labels. A build-time ELF/disassembly checker proves it has zero external symbols, no writable data, no patch sites and no indirect branches. |
-| 🫥 **Hidden arena** | VMCS, VMXON, EPT tables, rings, page tables, stacks and policy live in physically contiguous chunks that every EPT view maps to a read-only zero page. Guest writes are discarded and logged as `tamper`. |
-| 🔬 **Per-CPU EPT views** | MTRR-aware 1G/2M/4K identity maps, split on demand. Watches are relaxed in *only the stepping CPU's* view for exactly one instruction (MTF), so another CPU cannot race through the window. |
-| ✍️ **Old/new value capture** | Write events carry the 8 bytes before and after. Enforce-mode writes land in a per-CPU scratch slot, so you see what the attacker *tried* to write while memory stays intact. |
-| 📌 **Architecturally exact pinning** | Emulated `MOV CR0/CR4` faults exactly where silicon faults, including `CR0.WP` vs `CR4.CET`, PCIDE and LA57. MSR writes check canonicality before the pin policy applies. |
-| 🧭 **Descriptor-table emulator** | All eight of `SGDT SIDT SLDT STR LGDT LIDT LLDT LTR`, with full base/index/scale/segment decoding from the VM-exit instruction information, a 4/5-level guest page walker (SMEP, SMAP, `AC`, WP, A/D), atomic split-page stores and correct `#PF` reflection. |
-| 🚫 **No confused deputy** | Every host write made on the guest's behalf (emulated stores, A/D bits, the `LTR` busy bit, hypercall output buffers) passes the same write policy as EPT. The hypervisor cannot be turned into a write gadget against itself or against guarded kernel pages. |
-| ⚡ **NMIs done right** | NMI exiting, virtual NMIs, NMI-window and interrupt-window fallback under STI blocking, a host NMI stub that finds its vCPU from the stack, and IDT-vectoring re-injection. Exercised with SMP `sysrq-l` NMI backtraces. |
-| 🔒 **One-way lock** | After `vtxctl lock --yes`: no `DEVIRT`, no unpin, no unwatch, no CPU offline, no suspend, no `rmmod`. Forged hypercalls from a rootkit return `-EPERM`. |
-| 📡 **Out-of-band evidence** | Optional UART mirror of every event, written from VMX root, which a compromised guest cannot filter. |
-| 🧪 **Tested like a product** | 1.55 M unit checks under ASan + UBSan, four libFuzzer harnesses with semantic oracles, and an adversarial in-guest test suite booted under emulated VT-x on seven Intel CPU models, from Sandy Bridge to Sapphire Rapids. |
+|  **Late launch under a live kernel** | Each CPU is virtualized from inside a `cpuhp` callback. `VMLAUNCH` "returns" into the same function as a guest, and devirtualization reverses it with an `IRETQ`, including a TSS busy-bit dance and an NMI-safe GS/IDT ordering. |
+|  **A root image that cannot be patched** | The VMX-root code is one translation unit, built in a separate module with no ftrace, no retpoline thunks, no CFI and no jump labels. A build-time ELF/disassembly checker proves it has zero external symbols, no writable data, no patch sites and no indirect branches. |
+|  **Hidden arena** | VMCS, VMXON, EPT tables, rings, page tables, stacks and policy live in physically contiguous chunks that every EPT view maps to a read-only zero page. Guest writes are discarded and logged as `tamper`. |
+|  **Per-CPU EPT views** | MTRR-aware 1G/2M/4K identity maps, split on demand. Watches are relaxed in *only the stepping CPU's* view for exactly one instruction (MTF), so another CPU cannot race through the window. |
+|  **Old/new value capture** | Write events carry the 8 bytes before and after. Enforce-mode writes land in a per-CPU scratch slot, so you see what the attacker *tried* to write while memory stays intact. |
+|  **Architecturally exact pinning** | Emulated `MOV CR0/CR4` faults exactly where silicon faults, including `CR0.WP` vs `CR4.CET`, PCIDE and LA57. MSR writes check canonicality before the pin policy applies. |
+|  **Descriptor-table emulator** | All eight of `SGDT SIDT SLDT STR LGDT LIDT LLDT LTR`, with full base/index/scale/segment decoding from the VM-exit instruction information, a 4/5-level guest page walker (SMEP, SMAP, `AC`, WP, A/D), atomic split-page stores and correct `#PF` reflection. |
+|  **No confused deputy** | Every host write made on the guest's behalf (emulated stores, A/D bits, the `LTR` busy bit, hypercall output buffers) passes the same write policy as EPT. The hypervisor cannot be turned into a write gadget against itself or against guarded kernel pages. |
+|  **NMIs done right** | NMI exiting, virtual NMIs, NMI-window and interrupt-window fallback under STI blocking, a host NMI stub that finds its vCPU from the stack, and IDT-vectoring re-injection. Exercised with SMP `sysrq-l` NMI backtraces. |
+|  **One-way lock** | After `vtxctl lock --yes`: no `DEVIRT`, no unpin, no unwatch, no CPU offline, no suspend, no `rmmod`. Forged hypercalls from a rootkit return `-EPERM`. |
+|  **Out-of-band evidence** | Optional UART mirror of every event, written from VMX root, which a compromised guest cannot filter. |
+|  **Tested like a product** | 1.55 M unit checks under ASan + UBSan, four libFuzzer harnesses with semantic oracles, and an adversarial in-guest test suite booted under emulated VT-x on seven Intel CPU models, from Sandy Bridge to Sapphire Rapids. |
 
 ---
 
