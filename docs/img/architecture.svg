@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 860" width="1200" height="860" role="img" aria-label="Intel VT-x Hypervisor architecture">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#111733"/>
+    </linearGradient>
+    <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#94a3b8"/>
+    </marker>
+    <marker id="arwr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#fb7185"/>
+    </marker>
+    <marker id="arwg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#4ade80"/>
+    </marker>
+  </defs>
+  <style>
+    .t { font-family: Inter, Segoe UI, Helvetica, Arial, sans-serif; fill: #e2e8f0; }
+    .m { font-family: JetBrains Mono, Consolas, monospace; }
+    .band { font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+    .h { font-size: 16px; font-weight: 700; }
+    .s { font-size: 12.5px; fill: #cbd5e1; }
+    .xs { font-size: 11.5px; fill: #94a3b8; }
+  </style>
+  <rect width="1200" height="860" fill="url(#bg)"/>
+
+  <rect x="20" y="20" width="1160" height="120" rx="14" fill="#0f2a3d" stroke="#22d3ee" stroke-opacity="0.5"/>
+  <text x="40" y="46" class="t band" fill="#67e8f9">USER SPACE</text>
+  <rect x="40" y="58" width="420" height="68" rx="10" fill="#083344" stroke="#22d3ee"/>
+  <text x="58" y="84" class="t h">vtxctl</text>
+  <text x="58" y="106" class="t s m">status · check · caps · watch · guard · pin · lock · events · stats</text>
+  <rect x="490" y="58" width="300" height="68" rx="10" fill="#083344" stroke="#22d3ee" stroke-dasharray="4 3"/>
+  <text x="508" y="84" class="t h">/proc/kallsyms</text>
+  <text x="508" y="106" class="t s">symbolizes RIPs · resolves --sym</text>
+  <rect x="820" y="58" width="340" height="68" rx="10" fill="#083344" stroke="#22d3ee" stroke-dasharray="4 3"/>
+  <text x="838" y="84" class="t h">JSON event stream</text>
+  <text x="838" y="106" class="t s">pid · comm · rip · gpa · old → new</text>
+
+  <rect x="20" y="160" width="1160" height="230" rx="14" fill="#1e1b4b" stroke="#818cf8" stroke-opacity="0.55"/>
+  <text x="290" y="186" class="t band" fill="#a5b4fc">GUEST KERNEL · VMX NON-ROOT</text>
+  <text x="1160" y="186" class="t xs" text-anchor="end">Linux keeps running, unmodified</text>
+  <rect x="40" y="200" width="520" height="170" rx="12" fill="#312e81" stroke="#818cf8"/>
+  <text x="60" y="228" class="t h">vtxhv.ko · control plane</text>
+  <text x="60" y="252" class="t s">• probes VMX caps, MTRRs, RAM map, kernel code/rodata</text>
+  <text x="60" y="274" class="t s">• carves the hidden arena (2 MiB chunks)</text>
+  <text x="60" y="296" class="t s">• builds private host page tables + per-CPU EPT views</text>
+  <text x="60" y="318" class="t s">• programs VMCS, launches CPUs via cpuhp, PM/reboot hooks</text>
+  <text x="60" y="340" class="t s">• /dev/vtxhv ioctls → VMCALL hypercalls</text>
+  <rect x="590" y="200" width="270" height="170" rx="12" fill="#3b0d1e" stroke="#fb7185" stroke-dasharray="6 4"/>
+  <text x="610" y="228" class="t h" fill="#fecdd3">kernel rootkit</text>
+  <text x="610" y="252" class="t s">clear CR0.WP / SMEP</text>
+  <text x="610" y="274" class="t s">hook LSTAR, LIDT a fake IDT</text>
+  <text x="610" y="296" class="t s">patch kernel text, IDT</text>
+  <text x="610" y="318" class="t s">read/patch hypervisor memory</text>
+  <text x="610" y="340" class="t s">forge DEVIRT hypercalls</text>
+  <rect x="890" y="200" width="270" height="170" rx="12" fill="#1e293b" stroke="#64748b"/>
+  <text x="910" y="228" class="t h">Linux kernel</text>
+  <text x="910" y="252" class="t s">own IDT, GDT, page tables</text>
+  <text x="910" y="274" class="t s">NMIs reflected faithfully</text>
+  <text x="910" y="296" class="t s">CPUID 0x40000000:</text>
+  <text x="910" y="318" class="t s m">"VtxHvIntrspc"</text>
+  <text x="910" y="340" class="t s">VMX hidden from CPUID</text>
+
+  <path d="M250 126V200" stroke="#94a3b8" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="262" y="168" class="t xs m">ioctl</text>
+
+  <rect x="20" y="410" width="1160" height="300" rx="14" fill="#2a0f2e" stroke="#f472b6" stroke-opacity="0.55"/>
+  <text x="330" y="436" class="t band" fill="#f9a8d4">VMX ROOT · vtxhv_root.ko</text>
+  <text x="1160" y="703" class="t xs" text-anchor="end">zero external symbols · no patch sites · no indirect branches · verified at build time</text>
+  <rect x="40" y="452" width="250" height="236" rx="12" fill="#4a044e" stroke="#f472b6"/>
+  <text x="58" y="478" class="t h">exit stub → dispatcher</text>
+  <text x="58" y="502" class="t s">CPUID · CR · MSR · XSETBV</text>
+  <text x="58" y="524" class="t s">SGDT/SIDT/LGDT/LIDT</text>
+  <text x="58" y="546" class="t s">SLDT/STR/LLDT/LTR emulation</text>
+  <text x="58" y="568" class="t s">VMX insns → #UD</text>
+  <text x="58" y="590" class="t s">NMI exit / NMI window</text>
+  <text x="58" y="612" class="t s">hypercalls + one-way lock</text>
+  <text x="58" y="634" class="t s">fault-recovering RDMSR/WRMSR</text>
+  <text x="58" y="656" class="t s">exit-latency profiler</text>
+  <rect x="310" y="452" width="300" height="236" rx="12" fill="#4a044e" stroke="#f472b6"/>
+  <text x="328" y="478" class="t h">EPT engine + introspection</text>
+  <text x="328" y="502" class="t s">MTRR-aware identity maps</text>
+  <text x="328" y="524" class="t s">1G/2M/4K split on demand</text>
+  <text x="328" y="546" class="t s">watches: deny r/w/x, monitor|enforce</text>
+  <text x="328" y="568" class="t s">MTF single-step in this CPU's view</text>
+  <text x="328" y="590" class="t s">write-discard via scratch slots</text>
+  <text x="328" y="612" class="t s">old/new value capture</text>
+  <text x="328" y="634" class="t s">guest page walker (4/5-level)</text>
+  <text x="328" y="656" class="t s">task attribution (pid, comm)</text>
+  <rect x="630" y="452" width="250" height="236" rx="12" fill="#4a044e" stroke="#f472b6"/>
+  <text x="648" y="478" class="t h">private host env</text>
+  <text x="648" y="502" class="t s">own CR3: RAM + root image</text>
+  <text x="648" y="524" class="t s">own GDT · TSS · IDT</text>
+  <text x="648" y="546" class="t s">16 KiB stack per CPU</text>
+  <text x="648" y="568" class="t s">host NMI stub (stack-located)</text>
+  <text x="648" y="590" class="t s">UART fatal diagnostics</text>
+  <text x="648" y="612" class="t s">devirt: TR busy-bit dance,</text>
+  <text x="648" y="634" class="t s">GS→IDT ordering, IRETQ</text>
+  <rect x="900" y="452" width="260" height="236" rx="12" fill="#4a044e" stroke="#f472b6"/>
+  <text x="918" y="478" class="t h">event pipeline</text>
+  <text x="918" y="502" class="t s">per-CPU SPSC rings</text>
+  <text x="918" y="524" class="t s">global seq (lock xadd)</text>
+  <text x="918" y="546" class="t s">DRAIN hypercall → driver</text>
+  <text x="918" y="568" class="t s">out-of-band UART mirror</text>
+  <text x="918" y="590" class="t s">(serial_events=1)</text>
+  <text x="918" y="634" class="t s">128-byte events, 11 types</text>
+
+  <path d="M300 370V452" stroke="#94a3b8" stroke-width="2" marker-end="url(#arw)"/>
+  <text x="312" y="414" class="t xs m">VMCALL</text>
+  <path d="M760 370C760 410 700 420 700 452" stroke="#fb7185" stroke-width="2.2" stroke-dasharray="6 4" fill="none" marker-end="url(#arwr)"/>
+  <text x="772" y="404" class="t xs m" fill="#fda4af">VM exit · denied · logged</text>
+  <path d="M1030 452V370" stroke="#4ade80" stroke-width="2" marker-end="url(#arwg)"/>
+  <text x="1042" y="414" class="t xs m" fill="#86efac">VMRESUME</text>
+
+  <rect x="20" y="730" width="1160" height="110" rx="14" fill="#052e2b" stroke="#34d399" stroke-opacity="0.55"/>
+  <text x="40" y="756" class="t band" fill="#6ee7b7">HARDWARE · per-CPU EPT VIEWS OVER PHYSICAL MEMORY</text>
+  <g class="m" font-size="12.5">
+    <rect x="40" y="770" width="120" height="52" rx="8" fill="#064e3b" stroke="#34d399"/>
+    <text x="100" y="801" class="t" text-anchor="middle">CPU0 · EPT0</text>
+    <rect x="172" y="770" width="120" height="52" rx="8" fill="#064e3b" stroke="#34d399"/>
+    <text x="232" y="801" class="t" text-anchor="middle">CPU1 · EPT1</text>
+    <rect x="304" y="770" width="120" height="52" rx="8" fill="#064e3b" stroke="#34d399"/>
+    <text x="364" y="801" class="t" text-anchor="middle">CPUn · EPTn</text>
+    <rect x="460" y="770" width="210" height="52" rx="8" fill="#1e293b" stroke="#64748b"/>
+    <text x="565" y="793" class="t" text-anchor="middle">RAM / MMIO</text>
+    <text x="565" y="811" class="t xs" text-anchor="middle">identity, MTRR memory types</text>
+    <rect x="682" y="770" width="210" height="52" rx="8" fill="#3b0d1e" stroke="#fb7185"/>
+    <text x="787" y="793" class="t" text-anchor="middle">hypervisor arena</text>
+    <text x="787" y="811" class="t xs" text-anchor="middle">→ zero sink page (R/O)</text>
+    <rect x="904" y="770" width="256" height="52" rx="8" fill="#422006" stroke="#fbbf24"/>
+    <text x="1032" y="793" class="t" text-anchor="middle">root image text/rodata</text>
+    <text x="1032" y="811" class="t xs" text-anchor="middle">R+X / R only · writes discarded</text>
+  </g>
+</svg>

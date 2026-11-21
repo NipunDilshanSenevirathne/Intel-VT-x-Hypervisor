@@ -1,0 +1,206 @@
+[    0.000000] x86/CPU: Running old microcode
+[    0.068111] [Firmware Bug]: TSC_DEADLINE disabled due to Errata; please update microcode to version: 0x22 (or later)
+[    0.411552] Failed to access perfctr msr (MSR c4 is 0)
+[    0.450015] ACPI Error: AE_BAD_PARAMETER, During Region initialization (20250807/tbxfload-52)
+[    0.458509] ACPI: Unable to load the System Description Tables
+[    0.479114] ACPI Error: Could not remove SCI handler (20250807/evmisc-251)
+[    1.198644] ENERGY_PERF_BIAS: Set to 'normal', was 'performance'
+SUITE-BEGIN model=corei7_haswell_4770 cpus=1 kernel=6.18.0
+pdpe1gb vmx x2apic pti ept vpid smep 
+[    1.803372] vtxhv_root: loading out-of-tree module taints kernel.
+TEST load_root PASS 
+TEST load_driver PASS 
+  dmesg: [    1.803372] vtxhv_root: loading out-of-tree module taints kernel.
+  dmesg: [    1.845924] vtxhv: EPT view: 3 x 1G, 508 x 2M, 2048 x 4K leaves, limit 0x100000000
+  dmesg: [    1.846291] vtxhv: Intel VT-x hypervisor active on 1/1 CPUs; arena 2048 KiB in 1 chunks; EPT pool 7/352 pages; features 0x6e5ff
+TEST all_cpus_virtualized PASS   cpu0   virtualized   1/1 CPUs report the VtxHvIntrspc hypervisor via CPUID 0x40000000 
+ Intel VT-x Hypervisor  (VtxHvIntrspc, ABI 1)
+  state              ACTIVE on 1/1 CPUs
+  virtualized        cpu0 
+  policy lock        open
+  pins               none
+  watches            0 active slots
+  events             0 total, 0 dropped, 0 tamper attempts
+  EPT pool           7/352 pages (2.0%)
+  hypervisor arena   2048 KiB in 1 chunk @0xa00000 (hidden from guest)
+  root image         7 code pages, 1 rodata page (write-protected)
+  identity map       0 .. 0x100000000 (on-demand above), MAXPHYADDR 40, host paging 4-level
+  features           ept-1g ept-2m vpid virtual-nmi dt-exiting unrestricted exec-only mtf invpcid rdtscp true-ctls pti ept-wb introspection uart
+IA32_VMX_BASIC 0x00d810000000002b
+  VMCS revision 43, region 4096 bytes, memory type WB, TRUE controls yes, INS/OUTS info yes
+IA32_VMX_MISC 0x00000000200401e0
+  preemption-timer rate 2^0, CR3 targets 4, max MSR list 512, activity states HLT shutdown wait-for-SIPI, VMWRITE to exit fields yes
+MAXPHYADDR 40 bits   FEATURE_CONTROL 0x5 (lock 1, VMX outside SMX 1)
+CR0 fixed 0=0x80000021 1=0xffffffff   CR4 fixed 0=0x2000 1=0x1727ff
+
+Pin-based VM-execution controls  (allowed-0 0x00000016  allowed-1 0x0000007f)
+  [ 0] External-interrupt exiting               yes    
+  [ 3] NMI exiting                              yes    ● in use
+  [ 5] Virtual NMIs                             yes    ● in use
+  [ 6] VMX-preemption timer                     yes    
+TEST user_cpuid_signature PASS VtxHvIntrspc
+TEST user_cpuid_hides_vmx PASS 
+TEST user_vmcall_ud PASS signal=4
+TEST user_vmxon_faults PASS signal=4
+TEST user_desc_stores_hypervisor_emulated PASS sig=0 gdt=0xfffffe2cefacd000/0x7f idt=0xfffffe0000000000/0xfff tr=0x40 ldt=0
+TEST ldt_context_switch PASS rounds=1500 mismatches=0
+CONFIG pin0=0 dtexit=Y pinset=all
+TEST unpinned_cr0wp_allowed PASS cr0wp wp_before=1 wp_after_clear=0 faulted=0 cet=0
+TEST unpinned_lstar_allowed PASS lstar hijacked=1 before=0xffffffff84800080 after=0xffffffffdeadbeef
+TEST unpinned_lidt_allowed PASS lidt hijacked=1 orig=0xfffffe0000000000 after=0xffff8ea080673000
+TEST ltr_gdt_copy_prepared PASS ltrbuf pa=0x691000 tr=0x40 busy=0
+TEST ltr_sets_tss_busy PASS ltr tr=0x40 lgdt_applied=1 faulted=0 busy_before=0 busy_after=1
+TEST ltr_busy_write_denied_on_enforced_page PASS ltr tr=0x40 lgdt_applied=1 faulted=0 busy_before=0 busy_after=0
+TEST ltr_busy_write_monitored PASS ltr tr=0x40 lgdt_applied=1 faulted=0 busy_before=0 busy_after=1
+TEST ltr_busy_events_via_emulator PASS 
+TEST root_fault_recovery_gp_reflected PASS lstar_noncanon rc=-5 unchanged=1
+TEST event_msr_logged PASS 
+TEST event_cr0_audited_unpinned PASS 
+TEST pin_all PASS active pins: cr0.wp,cr4.smep,cr4.smap,cr4.umip,msr.syscall,msr.sysenter,msr.efer,idtr,gdtr,tr 
+TEST pinned_cr0wp_denied PASS cr0wp wp_before=1 wp_after_clear=1 faulted=0 cet=0
+TEST pinned_smep_denied PASS smep smep_before=1 smep_after_clear=1
+TEST pinned_lstar_denied PASS lstar hijacked=0 before=0xffffffff84800080 after=0xffffffff84800080
+TEST pinned_lidt_denied PASS lidt hijacked=0 orig=0xfffffe0000000000 after=0xfffffe0000000000
+TEST pinned_lgdt_denied PASS lgdt hijacked=0 orig=0xfffffe2cefacd000 after=0xfffffe2cefacd000
+TEST pinned_events_denied PASS 5
+TEST event_task_attribution PASS 
+TEST unknown_msr_forwarded PASS badmsr rc=0 (cpu ignores unknown msrs)
+TEST bad_xsetbv_reflected_gp PASS xsetbv faulted=1
+TEST guest_vmxon_ud PASS vmxon faulted=1
+TEST hypercall_unknown_einval PASS hc_bogus rc=-22
+TEST hypercall_badbuf_efault PASS hc_badbuf rc=-14
+TEST kprobe_root_refused PASS kprobe vtx_handle_exit rc=-22
+TEST kprobe_kernel_works PASS kprobe vfs_read rc=0
+TEST arena_hidden_from_guest PASS physread pa=0xa00000 value=0x0000000000000000
+TEST arena_write_discarded PASS physwrite pa=0xa00000 before=0x0 wrote=0x41 readback=0x0
+TEST root_code_readable PASS physread pa=0x800000 value=0x56415741fa1e0ff3
+TEST root_code_write_discarded PASS physwrite pa=0x800000 before=0xf3 wrote=0xcc readback=0xf3 / physread pa=0x800000 value=0x56415741fa1e0ff3
+TEST tamper_events PASS 2
+TEST sgdt_into_root_image_discarded PASS sgdt_at pa=0x800000 unchanged=1 stored=0
+TEST hypercall_outputs_into_root_image_refused PASS refused=4
+TEST hypercall_output_into_arena_refused PASS hc_out fn=query pa=0xa00000 rc=-14 unchanged=1
+TEST hypercall_output_plain_page_ok PASS hc_out fn=query pa=0x66d000 rc=0 unchanged=0
+TEST hypercall_refusal_events PASS 4
+TEST sgdt_tamper_event_via_emulator PASS 
+TEST status_tamper_count PASS 
+ID    DENY   MODE     GPA START            GPA END              PAGES   HITS       NAME
+3     -w-    monitor  0x18400000           0x18a33000           1587    0          kernel-text
+TEST text_guard_monitor_allows PASS physwrite pa=0x186d8be8 before=0x90 wrote=0xcc readback=0xcc
+TEST text_guard_monitor_event PASS 
+TEST watch_delete PASS watch 3 removed 
+TEST text_guard_enforce_discards PASS physwrite pa=0x186d8be8 before=0x90 wrote=0xcc readback=0x90
+TEST hypercall_output_into_guarded_text_refused PASS hc_out fn=drain pa=0x186d8be8 rc=-14 unchanged=1
+TEST text_guard_enforce_event_attempted_value PASS 
+TEST guard_rodata PASS guard rodata armed as watch 5 (monitor) 
+TEST guard_idt PASS guard idt armed as watch 6 (enforce) 
+TEST sgdt_into_enforced_watch_discarded PASS sgdt_at pa=0x66d000 unchanged=1 stored=0
+TEST sgdt_into_monitored_watch_stored PASS sgdt_at pa=0x66d000 unchanged=0 stored=1
+TEST sgdt_watch_events PASS 
+TEST watch_buf_rw PASS watch 9 armed on physical 0x66d000 +4096 (monitor) 
+TEST watch_write_monitor PASS bufwrite readback=0x1122334455667788
+TEST watch_read_monitor PASS bufread value=0x1122334455667788
+TEST watch_write_newval_captured PASS 
+TEST watch_read_event PASS 
+TEST watch_exec PASS watch 10 armed on physical 0x80c010 +4096 (monitor) 
+TEST exec_monitor_allows PASS call result=40
+TEST exec_event PASS 
+TEST straddle_layout PASS straddle va=0xffffffffc020effe off=0xffe pa_a=0x80e000 pa_b=0x80f000
+TEST exec_watch_page_straddling_insn PASS calls=200 sum=8400
+TEST straddle_second_page_events PASS fetches_into_second_page=200
+TEST mtf_step_interrupt_shadow PASS step_shadows=4249
+TEST watch_virtual_symbol PASS watch 13 armed on virtual 0xffffffff852099c0 +8 (monitor) 
+TEST watch_symbol_timer_writes PASS 610
+ID    DENY   MODE     GPA START            GPA END              PAGES   HITS       NAME
+5     -w-    monitor  0x18c00000           0x18ddb000           475     0          kernel-rodata
+6     -w-    enforce  0x19082000           0x19083000           1       0          idt
+9     rw-    monitor  0x66d000             0x66e000             1       3          testbuf
+10    --x    monitor  0x80c000             0x80e000             2       3646       target-x
+TEST stress_with_watch_churn PASS 
+VM-EXIT REASON                    COUNT    SHARE     AVG CYCLES
+CPUID                             25787   63.52%            115  ███████████████
+VMCALL                              127    0.31%          71964  
+VMXON                                 2    0.00%           1120  
+CR_ACCESS                             4    0.01%           1197  
+MSR_READ                              1    0.00%            140  
+MSR_WRITE                             5    0.01%           1006  
+MONITOR_TRAP_FLAG                  6151   15.15%           2268  ███
+GDTR_IDTR                            36    0.09%           7329  
+LDTR_TR                            2125    5.23%           1607  █
+EPT_VIOLATION                      6357   15.66%           2319  ███
+XSETBV                                1    0.00%            218  
+TOTAL                             40596
+
+per-CPU exits: cpu0=40596
+NMIs reflected 0, MTF steps 6151 (interrupt-shadowed 4945, recycled 0), spurious EPT 0, hypercalls 127, injected 5, emulator writes denied 8, events 6384 (dropped 0)
+TEST reload_cycles PASS cycles=5
+DEMO-BEGIN
+SEQ     CPU   TYPE       ACTION  TASK                   RIP                                DETAIL
+#1      cpu0  cr0        DENIED  1/init                 run+0x83 [vtxattack]  cr0 0x80050033 -> 0x80040033 (WP 1->0)
+#2      cpu0  msr-write  DENIED  1/init                 run+0x348 [vtxattack]  IA32_LSTAR(0xc0000082) 0xffffffff84800080 -> 0xffffffffdeadbeef
+#3      cpu0  msr-write  allowed 1/init                 run+0x385 [vtxattack]  IA32_LSTAR(0xc0000082) 0xffffffff84800080 -> 0xffffffff84800080
+#4      cpu0  dtr        DENIED  1/init                 run+0x5f5 [vtxattack]  LIDT 0xfffffe0000000000 -> 0xffff8ea0803b9000 limit=0xfff
+#5      cpu0  tamper     DENIED  1/init                 run+0x2cd [vtxattack]  target=hypervisor-memory gpa=0xa00000 gla=0xffffadc240009000 acc=-w- attempted=0x0000000000000041
+#6      cpu0  tamper     DENIED  1/init                 run+0x2cd [vtxattack]  target=hypervisor-image gpa=0x800000 gla=0xffffadc24000b000 acc=-w- attempted=0x56415741fa1e0fcc
+#7      cpu0  tamper     DENIED  1/init                 run+0x1293 [vtxattack]  target=hypervisor-image gpa=0x800200 gla=0xffffadc240015200 acc=-w- attempted=0xfe2cefacd000007f via-emulator
+#8      cpu0  hypercall  DENIED  1/init                 run+0xf6c [vtxattack]  hypercall 0x565448000000000b refused: output buffer 0x800000 overlaps protected page 0x800000
+ID    DENY   MODE     GPA START            GPA END              PAGES   HITS       NAME
+1     -w-    enforce  0x19082000           0x19083000           1       0          idt
+ Intel VT-x Hypervisor  (VtxHvIntrspc, ABI 1)
+  state              ACTIVE on 1/1 CPUs
+  virtualized        cpu0 
+  policy lock        open
+  pins               cr0.wp,cr4.smep,msr.syscall,idtr
+  watches            1 active slot
+  events             8 total, 0 dropped, 3 tamper attempts
+  EPT pool           8/352 pages (2.3%)
+  hypervisor arena   2048 KiB in 1 chunk @0xa00000 (hidden from guest)
+  root image         7 code pages, 1 rodata page (write-protected)
+  identity map       0 .. 0x100000000 (on-demand above), MAXPHYADDR 40, host paging 4-level
+  features           ept-1g ept-2m vpid virtual-nmi dt-exiting unrestricted exec-only mtf invpcid rdtscp true-ctls pti ept-wb introspection uart
+VM-EXIT REASON                    COUNT    SHARE     AVG CYCLES
+CPUID                              1654   98.57%            115  ████████████████████████
+VMCALL                               10    0.60%           3949  
+CR_ACCESS                             1    0.06%           1193  
+MSR_WRITE                             2    0.12%           1194  
+MONITOR_TRAP_FLAG                     2    0.12%           1287  
+GDTR_IDTR                             7    0.42%           7352  
+EPT_VIOLATION                         2    0.12%           4679  
+TOTAL                              1678
+
+per-CPU exits: cpu0=1678
+NMIs reflected 0, MTF steps 2 (interrupt-shadowed 0, recycled 0), spurious EPT 0, hypercalls 11, injected 0, emulator writes denied 2, events 8 (dropped 0)
+DEMO-END
+TEST lock_engage PASS policy lock engaged 
+TEST locked_devirt_refused PASS hc_devirt rc=-1
+TEST locked_unpin_refused PASS hc_unpin rc=-1
+TEST locked_unprotect_refused PASS hc_unprotect id=2 rc=-1
+TEST locked_cli_unpin_refused PASS 
+TEST locked_unload_refused PASS 
+TEST locked_pins_hold PASS cr0wp wp_before=1 wp_after_clear=1 faulted=0 cet=0
+TEST final_all_cpus_virtualized PASS   cpu0   virtualized   1/1 CPUs report the VtxHvIntrspc hypervisor via CPUID 0x40000000 
+ Intel VT-x Hypervisor  (VtxHvIntrspc, ABI 1)
+  state              ACTIVE on 1/1 CPUs
+  virtualized        cpu0 
+  policy lock        ENGAGED (one-way)
+  pins               cr0.wp,cr4.smep,cr4.smap,cr4.umip,msr.syscall,msr.sysenter,msr.efer,idtr,gdtr,tr
+  watches            2 active slots
+  events             9 total, 0 dropped, 3 tamper attempts
+  EPT pool           9/352 pages (2.6%)
+  hypervisor arena   2048 KiB in 1 chunk @0xa00000 (hidden from guest)
+  root image         7 code pages, 1 rodata page (write-protected)
+  identity map       0 .. 0x100000000 (on-demand above), MAXPHYADDR 40, host paging 4-level
+  features           ept-1g ept-2m vpid virtual-nmi dt-exiting unrestricted exec-only mtf invpcid rdtscp true-ctls pti ept-wb introspection uart
+VM-EXIT REASON                    COUNT    SHARE     AVG CYCLES
+CPUID                              3603   98.98%            115  ████████████████████████
+VMCALL                               22    0.60%           2829  
+CR_ACCESS                             2    0.05%           1193  
+MSR_WRITE                             2    0.05%           1194  
+MONITOR_TRAP_FLAG                     2    0.05%           1287  
+GDTR_IDTR                             7    0.19%           7352  
+EPT_VIOLATION                         2    0.05%           4679  
+TOTAL                              3640
+
+per-CPU exits: cpu0=3640
+NMIs reflected 0, MTF steps 2 (interrupt-shadowed 0, recycled 0), spurious EPT 0, hypercalls 23, injected 0, emulator writes denied 2, events 9 (dropped 0)
+TEST kernel_log_clean PASS 
+SUITE-END pass=83 fail=0

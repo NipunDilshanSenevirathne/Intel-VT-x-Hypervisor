@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 320" width="1280" height="320" role="img" aria-label="Intel VT-x Hypervisor">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#060a18"/>
+      <stop offset="0.55" stop-color="#0c1638"/>
+      <stop offset="1" stop-color="#1a0f3a"/>
+    </linearGradient>
+    <linearGradient id="title" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7dd3fc"/>
+      <stop offset="0.5" stop-color="#a5b4fc"/>
+      <stop offset="1" stop-color="#f0abfc"/>
+    </linearGradient>
+    <linearGradient id="chip" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0ea5e9"/>
+      <stop offset="1" stop-color="#6366f1"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#38bdf8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#38bdf8" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <rect width="1280" height="320" fill="url(#grid)"/>
+  <circle cx="190" cy="160" r="150" fill="url(#glow)"/>
+  <g transform="translate(110 80)">
+    <g stroke="#7dd3fc" stroke-width="4" stroke-linecap="round" opacity="0.9">
+      <path d="M30 0v-18M60 0v-18M90 0v-18M120 0v-18"/>
+      <path d="M30 160v18M60 160v18M90 160v18M120 160v18"/>
+      <path d="M0 30h-18M0 60h-18M0 90h-18M0 120h-18"/>
+      <path d="M160 30h18M160 60h18M160 90h18M160 120h18"/>
+    </g>
+    <rect width="160" height="160" rx="18" fill="url(#chip)"/>
+    <rect x="14" y="14" width="132" height="132" rx="12" fill="#0b1230" opacity="0.92"/>
+    <rect x="30" y="30" width="100" height="44" rx="8" fill="#f472b6" opacity="0.9"/>
+    <text x="80" y="58" font-family="JetBrains Mono, Consolas, monospace" font-size="17" font-weight="700" fill="#0b1230" text-anchor="middle">VMX ROOT</text>
+    <rect x="30" y="86" width="44" height="44" rx="8" fill="#22d3ee"/>
+    <rect x="86" y="86" width="44" height="44" rx="8" fill="#a78bfa"/>
+    <text x="52" y="114" font-family="JetBrains Mono, Consolas, monospace" font-size="13" font-weight="700" fill="#0b1230" text-anchor="middle">EPT</text>
+    <text x="108" y="114" font-family="JetBrains Mono, Consolas, monospace" font-size="13" font-weight="700" fill="#0b1230" text-anchor="middle">MTF</text>
+  </g>
+  <text x="380" y="132" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="64" font-weight="800" fill="url(#title)">Intel VT-x Hypervisor</text>
+  <text x="382" y="176" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="23" fill="#cbd5e1">Self-protecting EPT memory introspection for a live Linux kernel</text>
+  <g font-family="JetBrains Mono, Consolas, monospace" font-size="15" font-weight="600">
+    <rect x="382" y="200" width="168" height="32" rx="16" fill="#0ea5e9" fill-opacity="0.18" stroke="#38bdf8"/>
+    <text x="466" y="221" fill="#7dd3fc" text-anchor="middle">per-CPU EPT views</text>
+    <rect x="560" y="200" width="158" height="32" rx="16" fill="#a855f7" fill-opacity="0.18" stroke="#c084fc"/>
+    <text x="639" y="221" fill="#e9d5ff" text-anchor="middle">MTF step-over</text>
+    <rect x="728" y="200" width="196" height="32" rx="16" fill="#22c55e" fill-opacity="0.18" stroke="#4ade80"/>
+    <text x="826" y="221" fill="#bbf7d0" text-anchor="middle">CR / MSR / IDT pins</text>
+    <rect x="934" y="200" width="200" height="32" rx="16" fill="#f43f5e" fill-opacity="0.18" stroke="#fb7185"/>
+    <text x="1034" y="221" fill="#fecdd3" text-anchor="middle">tamper-proof arena</text>
+  </g>
+  <text x="382" y="276" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" font-size="17" fill="#94a3b8">by Nipun Dilshan Senevirathne  ·  C + x86-64 assembly  ·  Linux 6.x  ·  GPL-2.0</text>
+</svg>

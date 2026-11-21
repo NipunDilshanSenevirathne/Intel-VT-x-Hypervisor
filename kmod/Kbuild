@@ -1,0 +1,20 @@
+obj-m += vtxhv_root.o vtxhv.o
+
+vtxhv-y := main.o setup.o prep.o ctl.o
+
+vtx_root_remove := $(CC_FLAGS_FTRACE) $(RETPOLINE_CFLAGS) $(CC_FLAGS_CFI) $(PADDING_CFLAGS) \
+		   -fstack-protector -fstack-protector-strong -fstack-protector-all \
+		   -ftrivial-auto-var-init=zero -ftrivial-auto-var-init=pattern
+
+vtx_root_add := -fno-stack-protector -fno-tree-loop-distribute-patterns -fno-jump-tables -Wa,-I$(src) \
+		$(DISABLE_STACKLEAK_PLUGIN) $(DISABLE_KSTACK_ERASE) $(DISABLE_LATENT_ENTROPY_PLUGIN) \
+		$(DISABLE_STRUCTLEAK_PLUGIN)
+
+CFLAGS_REMOVE_vtxhv_root.o += $(vtx_root_remove)
+CFLAGS_vtxhv_root.o += $(vtx_root_add)
+OBJECT_FILES_NON_STANDARD_vtxhv_root.o := y
+KASAN_SANITIZE_vtxhv_root.o := n
+KCSAN_SANITIZE_vtxhv_root.o := n
+KMSAN_SANITIZE_vtxhv_root.o := n
+UBSAN_SANITIZE_vtxhv_root.o := n
+KCOV_INSTRUMENT_vtxhv_root.o := n

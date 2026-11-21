@@ -1,0 +1,69 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q build-essential linux-headers-$(uname -r) python3-pip
+          pip install --break-system-packages pyelftools capstone
+      - name: Build modules against the runner kernel
+        run: make modules KDIR=/lib/modules/$(uname -r)/build
+      - name: Verify VMX-root image isolation
+        run: make check KDIR=/lib/modules/$(uname -r)/build
+      - name: Build vtxctl
+        run: make tools
+
+  unit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit, property and concurrency tests (ASan + UBSan)
+        run: make test-unit
+
+  fuzz:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q clang libclang-rt-18-dev
+      - name: libFuzzer campaigns
+        run: make test-fuzz FUZZ_TIME=120
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: fuzz-crashes
+          path: tests/fuzz/crash-*
+
+  emulated-vtx:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q build-essential flex bison libelf-dev bc libssl-dev cpio \
+            busybox-static isolinux syslinux-common genisoimage python3-pip
+          pip install --break-system-packages pyelftools capstone
+      - uses: actions/cache@v4
+        with:
+          path: .cache
+          key: vtx-${{ hashFiles('scripts/build-bochs.sh', 'scripts/build-test-kernel.sh', 'tests/vm/kernel.config') }}
+      - name: Boot the hypervisor across the CPU-model matrix
+        run: make test-vm
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: emulated-vtx-logs
+          path: tests/vm/out/
