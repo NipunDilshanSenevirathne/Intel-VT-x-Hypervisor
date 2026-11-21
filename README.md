@@ -3,7 +3,6 @@
 </p>
 
 <p align="center">
-  <img alt="language" src="https://img.shields.io/badge/C%20%2B%20x86--64%20asm-hand--written-0b5fff?style=flat-square">
   <img alt="platform" src="https://img.shields.io/badge/Linux%206.x-Intel%20VT--x%20%2B%20EPT-7c3aed?style=flat-square">
   <img alt="tests" src="https://img.shields.io/badge/unit%20checks-1.55M-16a34a?style=flat-square">
   <img alt="fuzz" src="https://img.shields.io/badge/libFuzzer-4%20harnesses-ea580c?style=flat-square">
